@@ -27,6 +27,11 @@
                                         <v-col cols="12">
                                             <v-text-field v-model="loginPassword" :append-icon="show1?'eye':'eye-off'" :rules="[rules.required, rules.min]" :type="show1 ? 'text' : 'password'" name="input-10-1" label="Password" hint="At least 8 characters" counter @click:append="show1 = !show1"></v-text-field>
                                         </v-col>
+                                        <v-col cols="12">
+                                            <v-label v-model="loginError" v-if="error1" name="error-10-1">
+                                                <span style="color:#ff0000">Usuario o contraseña incorrectos</span>
+                                            </v-label>
+                                        </v-col>
                                         <v-col class="d-flex" cols="12" sm="6" xsm="12">
                                         </v-col>
                                         <v-spacer></v-spacer>
@@ -78,6 +83,7 @@
    
 </template>
 <script>
+    import axios from 'axios';
     export default {
         computed: {
             passwordMatch() {
@@ -89,6 +95,28 @@
             validate() {
                 if (this.$refs.loginForm.validate()) {
                     // submit form to server/API here...
+                    console.log("Authenticating...");
+                    axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
+                    axios.post("http://127.0.0.1:8000/user/auth/", {
+                        useremail: this.loginEmail,
+                        password: this.loginPassword
+                    },{
+                        headers: {}
+                    }).then(response=>{
+                            this.success=response.data.Autenticado;
+                            console.log(response);
+
+                            if(this.success){
+                                console.log("Logged");
+                                this.error1=false;
+
+                                localStorage.setItem("userLogged", response.data.Autenticado);
+                                this.$router.push('/');
+                            }else{
+                                console.log("User or Password incorrect");
+                                this.error1=true;
+                            }
+                        })                    
                 }
             },
             closeModal () {
@@ -118,6 +146,7 @@
         verify: "",
         loginPassword: "",
         loginEmail: "",
+        loginError: "",
         loginEmailRules: [
         v => !!v || "Required",
         v => /.+@.+\..+/.test(v) || "E-mail must be valid"
@@ -129,6 +158,7 @@
 
         show1: false,
         show2: false,
+        error1: false,
         rules: {
         required: value => !!value || "Required.",
         min: v => (v && v.length >= 8) || "Min 8 characters"

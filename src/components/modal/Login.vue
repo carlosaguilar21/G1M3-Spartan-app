@@ -115,20 +115,20 @@ export default {
       if (this.email && this.password) {
         this.success=false;
 
-        axios.post("http://127.0.0.1:8000/user/auth/", {
+        /*axios.post("http://127.0.0.1:8000/user/auth/", {
           useremail: this.email,
           password: this.password
-        }).then(response=>this.success=response.Autenticado)
+        }).then(response=>this.success=response.Autenticado)*/
 
-        if(success){
+        //if(this.success){
           this.highlightEmailWithError = false;
           this.highlightPasswordWithError = false;
           this.isFormSuccess = true;
           this.$store.commit('isUserLoggedIn', this.isFormSuccess);
-        }else{
+        /*}else{
           this.highlightEmailWithError = true;
           this.highlightPasswordWithError = true;
-        }
+        }*/
       }
 
       if (!this.email) {
